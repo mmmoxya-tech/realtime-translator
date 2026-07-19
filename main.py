@@ -39,6 +39,9 @@ def main():
                         help="字幕字号缩放比例")
     parser.add_argument("--overlay-animation-ms", type=int, default=180,
                         help="文字淡入动画毫秒数，设为 0 可关闭")
+    parser.add_argument("--overlay-long-text",
+                        choices=("latest", "beginning"), default="latest",
+                        help="长字幕优先显示最新内容或句子开头")
     args = parser.parse_args()
     if args.diagnose:
         raise SystemExit(report())

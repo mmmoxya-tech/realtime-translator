@@ -102,14 +102,17 @@ class Overlay(Gtk.Application):
         self.translation = Gtk.Label(label="正在启动…")
         self.translation.add_css_class("translation")
         self.translation.set_wrap(False)
-        self.translation.set_ellipsize(Pango.EllipsizeMode.END)
+        ellipsize = (Pango.EllipsizeMode.START
+                     if self.args.overlay_long_text == "latest"
+                     else Pango.EllipsizeMode.END)
+        self.translation.set_ellipsize(ellipsize)
         self.translation.set_lines(1)
         self.translation.set_hexpand(True)
         self.translation.set_justify(Gtk.Justification.CENTER)
         self.original = Gtk.Label()
         self.original.add_css_class("original")
         self.original.set_wrap(False)
-        self.original.set_ellipsize(Pango.EllipsizeMode.END)
+        self.original.set_ellipsize(ellipsize)
         self.original.set_lines(1)
         self.original.set_hexpand(True)
         self.original.set_justify(Gtk.Justification.CENTER)
@@ -236,6 +239,8 @@ def parse_args():
     parser.add_argument("--overlay-timeout", type=float, default=4.0)
     parser.add_argument("--overlay-scale", type=float, default=1.0)
     parser.add_argument("--overlay-animation-ms", type=int, default=180)
+    parser.add_argument("--overlay-long-text", choices=("latest", "beginning"),
+                        default="latest")
     return parser.parse_known_args()[0]
 
 
