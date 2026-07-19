@@ -12,10 +12,20 @@ from gi.repository import Gio, GLib, Gtk, Gtk4LayerShell, Pango
 
 
 CSS = b"""
-window { background: transparent; }
-.card {
-        background: transparent;
-        border: none;
+window.translator-window,
+window.translator-window.background,
+#realtime-translator-window {
+        background-color: transparent;
+        background-image: none;
+        border-color: transparent;
+        border-radius: 0;
+        box-shadow: none;
+}
+.translator-surface {
+        background-color: transparent;
+        background-image: none;
+        border-color: transparent;
+        border-radius: 0;
         box-shadow: none;
         padding: 8px 16px;
 }
@@ -71,6 +81,8 @@ class Overlay(Gtk.Application):
 
     def do_activate(self):
         window = Gtk.ApplicationWindow(application=self)
+        window.set_name("realtime-translator-window")
+        window.add_css_class("translator-window")
         window.set_default_size(self.args.overlay_width, 1)
         Gtk4LayerShell.init_for_window(window)
         Gtk4LayerShell.set_namespace(window, "realtime-translator")
@@ -82,9 +94,9 @@ class Overlay(Gtk.Application):
         provider = Gtk.CssProvider()
         provider.load_from_data(CSS)
         Gtk.StyleContext.add_provider_for_display(
-            window.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_APPLICATION)
+            window.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
-        card.add_css_class("card")
+        card.add_css_class("translator-surface")
         card.set_size_request(self.args.overlay_width, -1)
         self.card = card
         self.translation = Gtk.Label(label="正在启动…")
