@@ -70,6 +70,9 @@ WebVTT，输出格式由文件扩展名决定。SRT/VTT 第一行显示中文，
 模糊；如需完全无背景的纯文字，可使用 `--overlay-style clear`。宽屏可使用
 `--overlay-width 1280` 或更大值。
 
+无新字幕超过 `--overlay-timeout` 后，程序会取消映射整个 layer-shell 窗口，
+文字、玻璃底色和 Niri 背景模糊会一起消失；下一次语音事件会自动重新显示。
+
 环境诊断：
 
 ```bash

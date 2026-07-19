@@ -72,6 +72,7 @@ class Overlay(Gtk.Application):
         self.target_opacity = 1.0
         self.label_markup = {}
         self.text_animations = {}
+        self.held = False
 
     def text_size(self, base):
         return str(round(base * self.args.overlay_scale))
@@ -91,6 +92,9 @@ class Overlay(Gtk.Application):
         self.text_animations[label] = (time.monotonic(), duration, strength)
 
     def do_activate(self):
+        if not self.held:
+            self.hold()
+            self.held = True
         window = Gtk.ApplicationWindow(application=self)
         window.set_name("realtime-translator-window")
         window.add_css_class("translator-window")
@@ -145,15 +149,22 @@ class Overlay(Gtk.Application):
         GLib.timeout_add(50, self.tick)
 
     def reveal(self):
-        self.card.set_visible(True)
+        if not self.window.get_visible():
+            self.window.present()
         self.target_opacity = 1.0
 
     def on_input(self, fd, condition):
         if condition & (GLib.IOCondition.HUP | GLib.IOCondition.ERR):
+            if self.held:
+                self.release()
+                self.held = False
             self.quit()
             return GLib.SOURCE_REMOVE
         chunk = sys.stdin.buffer.read1(8192)
         if not chunk:
+            if self.held:
+                self.release()
+                self.held = False
             self.quit()
             return GLib.SOURCE_REMOVE
         self.buffer += chunk
@@ -243,7 +254,7 @@ class Overlay(Gtk.Application):
             self.opacity = max(self.target_opacity, self.opacity - 0.12)
         self.card.set_opacity(self.opacity)
         if self.opacity == 0.0:
-            self.card.set_visible(False)
+            self.window.set_visible(False)
             self.last_update = 0.0
         return GLib.SOURCE_CONTINUE
 
