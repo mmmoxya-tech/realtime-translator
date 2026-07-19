@@ -47,6 +47,7 @@ translate --overlay-timeout 6 --overlay-scale 1.15
 translate --overlay-animation-ms 220
 translate --overlay-long-text latest
 translate --overlay-style glass
+translate --overlay-update-interval 1.2
 translate --glossary glossaries/technology.json
 translate --glossary glossaries/gaming.json --glossary glossaries/news.json
 translate --subtitle-output ~/Videos/live-captions.srt
@@ -72,6 +73,10 @@ WebVTT，输出格式由文件扩展名决定。SRT/VTT 第一行显示中文，
 
 无新字幕超过 `--overlay-timeout` 后，程序会取消映射整个 layer-shell 窗口，
 文字、玻璃底色和 Niri 背景模糊会一起消失；下一次语音事件会自动重新显示。
+
+为避免增量翻译频繁横跳，中文译文默认最多每 0.9 秒更新一次；间隔内到达的
+多个版本会合并为最新版本。阅读速度较慢时可使用
+`--overlay-update-interval 1.2`，设为 `0` 可恢复每次增量立即更新。
 
 环境诊断：
 

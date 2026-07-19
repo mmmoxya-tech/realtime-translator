@@ -44,6 +44,8 @@ def main():
                         help="长字幕优先显示最新内容或句子开头")
     parser.add_argument("--overlay-style", choices=("glass", "clear"),
                         default="glass", help="透明玻璃或纯文字样式")
+    parser.add_argument("--overlay-update-interval", type=float, default=0.9,
+                        help="中文译文两次更新之间的最短秒数")
     args = parser.parse_args()
     if args.diagnose:
         raise SystemExit(report())
@@ -58,6 +60,8 @@ def main():
         parser.error("字幕隐藏时间必须大于零，字号缩放范围为 0.5 到 2.5")
     if not 0 <= args.overlay_animation_ms <= 1000:
         parser.error("文字动画时长范围为 0 到 1000 毫秒")
+    if not 0 <= args.overlay_update_interval <= 3:
+        parser.error("译文更新间隔范围为 0 到 3 秒")
     run(args)
 
 

@@ -10,6 +10,8 @@ gi.require_version("Gtk", "4.0")
 gi.require_version("Gtk4LayerShell", "1.0")
 from gi.repository import Gio, GLib, Gtk, Gtk4LayerShell, Pango
 
+from rttranslate.display import LatestUpdateGate
+
 
 CSS = b"""
 window.translator-window,
@@ -73,6 +75,11 @@ class Overlay(Gtk.Application):
         self.label_markup = {}
         self.text_animations = {}
         self.held = False
+        self.translation_gate = LatestUpdateGate(
+            args.overlay_update_interval)
+        hypothesis_interval = (0 if args.overlay_update_interval == 0 else
+                               min(0.3, args.overlay_update_interval / 3))
+        self.hypothesis_gate = LatestUpdateGate(hypothesis_interval)
 
     def text_size(self, base):
         return str(round(base * self.args.overlay_scale))
@@ -194,10 +201,23 @@ class Overlay(Gtk.Application):
         revision = int(event.get("revision", 0))
         if utterance_id > self.current_id:
             self.current_revision = 0
+            self.translation_gate.discard_before(utterance_id)
+            self.hypothesis_gate.discard_before(utterance_id)
         if utterance_id == self.current_id and revision < self.current_revision:
             return
         self.current_id = utterance_id
         self.current_revision = revision
+        now = time.monotonic()
+        if kind == "translation":
+            ready = self.translation_gate.submit(event, now)
+            if ready is not None:
+                self.show_translation(ready)
+            return
+        if kind == "hypothesis":
+            ready = self.hypothesis_gate.submit(event, now)
+            if ready is not None:
+                self.show_hypothesis(ready)
+            return
         original = event.get("original", "")
         if original:
             self.original.set_visible(True)
@@ -211,33 +231,63 @@ class Overlay(Gtk.Application):
                 f'<span size="{self.text_size(14500)}" alpha="65%">正在识别…</span>',
                 0.25)
             self.original.set_visible(False)
-        elif kind == "hypothesis":
-            self.original.set_visible(True)
-            self.set_animated_markup(self.original,
-                f'<span size="{self.text_size(14000)}">'
-                f'{html.escape(event.get("original", ""))}</span>', 0.14)
-            if self.translated_id != utterance_id:
-                self.set_animated_markup(self.translation,
-                    f'<span size="{self.text_size(14500)}" '
-                    'alpha="65%">正在识别…</span>', 0.2)
         elif kind == "final":
             if self.translated_id != utterance_id:
                 self.set_animated_markup(
                     self.translation,
                     f'<span size="{self.text_size(14500)}">正在翻译…</span>', 0.25)
-        elif kind == "translation":
-            self.translated_id = utterance_id
-            self.set_animated_markup(self.translation,
-                f'<span size="{self.text_size(18000)}">'
-                f'{html.escape(event.get("translation", ""))}</span>', 0.42)
         elif kind == "error":
             self.set_animated_markup(
                 self.translation,
                 f'<span size="{self.text_size(14500)}">翻译暂时不可用</span>', 0.3)
             self.translation.add_css_class("error")
 
+    def show_hypothesis(self, event):
+        utterance_id = int(event.get("utterance_id", 0))
+        revision = int(event.get("revision", 0))
+        if (utterance_id < self.current_id or
+                (utterance_id == self.current_id and
+                 revision < self.current_revision)):
+            return
+        self.original.set_visible(True)
+        self.set_animated_markup(
+            self.original,
+            f'<span size="{self.text_size(14000)}">'
+            f'{html.escape(event.get("original", ""))}</span>', 0.08)
+        if self.translated_id != utterance_id:
+            self.set_animated_markup(
+                self.translation,
+                f'<span size="{self.text_size(14500)}" '
+                'alpha="65%">正在识别…</span>', 0.15)
+
+    def show_translation(self, event):
+        utterance_id = int(event.get("utterance_id", 0))
+        revision = int(event.get("revision", 0))
+        if (utterance_id < self.current_id or
+                (utterance_id == self.current_id and
+                 revision < self.current_revision)):
+            return
+        self.translated_id = utterance_id
+        original = event.get("original", "")
+        if original:
+            self.original.set_visible(True)
+            self.set_animated_markup(
+                self.original,
+                f'<span size="{self.text_size(13500)}">'
+                f'{html.escape(original)}</span>', 0.08)
+        self.set_animated_markup(
+            self.translation,
+            f'<span size="{self.text_size(18000)}">'
+            f'{html.escape(event.get("translation", ""))}</span>', 0.32)
+
     def tick(self):
         now = time.monotonic()
+        pending_translation = self.translation_gate.pop_due(now)
+        if pending_translation is not None:
+            self.show_translation(pending_translation)
+        pending_hypothesis = self.hypothesis_gate.pop_due(now)
+        if pending_hypothesis is not None:
+            self.show_hypothesis(pending_hypothesis)
         for label, (started_at, duration, strength) in list(
                 self.text_animations.items()):
             progress = min(1.0, (now - started_at) / duration)
@@ -270,6 +320,7 @@ def parse_args():
                         default="latest")
     parser.add_argument("--overlay-style", choices=("glass", "clear"),
                         default="glass")
+    parser.add_argument("--overlay-update-interval", type=float, default=0.9)
     return parser.parse_known_args()[0]
 
 
