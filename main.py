@@ -42,6 +42,8 @@ def main():
     parser.add_argument("--overlay-long-text",
                         choices=("latest", "beginning"), default="latest",
                         help="长字幕优先显示最新内容或句子开头")
+    parser.add_argument("--overlay-style", choices=("glass", "clear"),
+                        default="glass", help="透明玻璃或纯文字样式")
     args = parser.parse_args()
     if args.diagnose:
         raise SystemExit(report())

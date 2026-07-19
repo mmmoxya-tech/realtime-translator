@@ -29,6 +29,17 @@ window.translator-window.background,
         box-shadow: none;
         padding: 8px 16px;
 }
+.translator-surface.glass {
+        background-color: rgba(20,24,32,.20);
+        background-image: linear-gradient(to bottom,
+                          rgba(255,255,255,.13),
+                          rgba(255,255,255,.025));
+        border: 1px solid rgba(255,255,255,.24);
+        border-radius: 20px;
+        box-shadow: inset 0 1px 0 rgba(255,255,255,.14),
+                    0 8px 24px rgba(0,0,0,.18);
+        padding: 10px 22px;
+}
 .translation {
         color: rgba(255,255,255,.98);
         font-family: "Noto Sans CJK SC", "Noto Sans", sans-serif;
@@ -85,7 +96,10 @@ class Overlay(Gtk.Application):
         window.add_css_class("translator-window")
         window.set_default_size(self.args.overlay_width, 1)
         Gtk4LayerShell.init_for_window(window)
-        Gtk4LayerShell.set_namespace(window, "realtime-translator")
+        namespace = ("realtime-translator-glass"
+                     if self.args.overlay_style == "glass"
+                     else "realtime-translator")
+        Gtk4LayerShell.set_namespace(window, namespace)
         Gtk4LayerShell.set_layer(window, Gtk4LayerShell.Layer.OVERLAY)
         Gtk4LayerShell.set_anchor(window, Gtk4LayerShell.Edge.BOTTOM, True)
         Gtk4LayerShell.set_margin(
@@ -97,6 +111,8 @@ class Overlay(Gtk.Application):
             window.get_display(), provider, Gtk.STYLE_PROVIDER_PRIORITY_USER + 1)
         card = Gtk.Box(orientation=Gtk.Orientation.VERTICAL, spacing=4)
         card.add_css_class("translator-surface")
+        if self.args.overlay_style == "glass":
+            card.add_css_class("glass")
         card.set_size_request(self.args.overlay_width, -1)
         self.card = card
         self.translation = Gtk.Label(label="正在启动…")
@@ -241,6 +257,8 @@ def parse_args():
     parser.add_argument("--overlay-animation-ms", type=int, default=180)
     parser.add_argument("--overlay-long-text", choices=("latest", "beginning"),
                         default="latest")
+    parser.add_argument("--overlay-style", choices=("glass", "clear"),
+                        default="glass")
     return parser.parse_known_args()[0]
 
 

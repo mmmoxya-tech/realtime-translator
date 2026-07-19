@@ -46,6 +46,7 @@ translate --overlay-width 1280 --overlay-bottom 90
 translate --overlay-timeout 6 --overlay-scale 1.15
 translate --overlay-animation-ms 220
 translate --overlay-long-text latest
+translate --overlay-style glass
 translate --glossary glossaries/technology.json
 translate --glossary glossaries/gaming.json --glossary glossaries/news.json
 translate --subtitle-output ~/Videos/live-captions.srt
@@ -65,8 +66,9 @@ WebVTT，输出格式由文件扩展名决定。SRT/VTT 第一行显示中文，
 悬浮字幕默认宽度为 1120 像素，中文和英文各保持一行，超出宽度的内容按策略省略，
 不会因为字幕变长继续向上增高。默认从左侧省略已经读过的旧内容，使句子后半段
 和最新识别词始终可见；如需优先保留句首，可使用
-`--overlay-long-text beginning`。字幕没有卡片背景和边框，通过文字阴影保持
-明暗画面上的可读性。宽屏可使用 `--overlay-width 1280` 或更大值。
+`--overlay-long-text beginning`。默认 `glass` 样式使用轻薄半透明底色与背景
+模糊；如需完全无背景的纯文字，可使用 `--overlay-style clear`。宽屏可使用
+`--overlay-width 1280` 或更大值。
 
 环境诊断：
 
