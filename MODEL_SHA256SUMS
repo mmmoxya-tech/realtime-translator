@@ -1,0 +1,7 @@
+b4fedbc97c2006f6d8fc089e58a2eb7385cb66b16a5dbbf136e23e6490fcfb80  models/opus-mt-en-zh-ct2/model.bin
+5775ddc9e3ff2fae91554da56468ad35ff56edaba870fea74447bc7234bfdaa8  models/opus-mt-en-zh-source/source.spm
+81dc94efa84e4025ef38d25d5d07429fe41e3eb29d44003f1db6fe98487b0052  models/opus-mt-en-zh-source/target.spm
+093e23c90869898f761f60aa3363f96d43b9c6e5c06a57860c3a5b3407ab8320  models/sherpa-onnx-streaming-zipformer-en-2023-06-21/decoder-epoch-99-avg-1.int8.onnx
+32c98281c7bd8b63e3e142d007251b37f120572e8fdea9a4f5a79ce22b10ec4f  models/sherpa-onnx-streaming-zipformer-en-2023-06-21/encoder-epoch-99-avg-1.int8.onnx
+831477d390e59a61f1b6a6f763b9903e6c6366ff6034f1ddba613be82637122f  models/sherpa-onnx-streaming-zipformer-en-2023-06-21/joiner-epoch-99-avg-1.int8.onnx
+9d611f445fe4a46186080fe161be6059d87d72eb88d3a8cb00c1a06e83a6067e  models/sherpa-onnx-online-punct-en-2024-08-06/model.int8.onnx

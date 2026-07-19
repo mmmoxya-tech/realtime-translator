@@ -1,0 +1,52 @@
+[
+  {
+    "source": "The meeting has been moved to next Friday afternoon.",
+    "reference": "会议已改到下周五下午。",
+    "domain": "general"
+  },
+  {
+    "source": "Turn left after the traffic light and keep going for two miles.",
+    "reference": "过红绿灯后左转，然后继续行驶两英里。",
+    "domain": "general"
+  },
+  {
+    "source": "The server returned a 503 error because the database connection timed out.",
+    "reference": "由于数据库连接超时，服务器返回了 503 错误。",
+    "domain": "technology"
+  },
+  {
+    "source": "He is one shot behind the box.",
+    "reference": "他在箱子后面，残血一枪。",
+    "domain": "gaming"
+  },
+  {
+    "source": "Push left with me, but do not peek mid.",
+    "reference": "跟我一起压左边，但别探中路。",
+    "domain": "gaming"
+  },
+  {
+    "source": "Apple announced a new chip for on-device artificial intelligence.",
+    "reference": "苹果发布了一款用于端侧人工智能的新芯片。",
+    "domain": "technology"
+  },
+  {
+    "source": "Could you explain the difference between latency and throughput?",
+    "reference": "你能解释一下延迟和吞吐量的区别吗？",
+    "domain": "technology"
+  },
+  {
+    "source": "I would have called you earlier if I had known.",
+    "reference": "如果我早知道，就会早点给你打电话。",
+    "domain": "general"
+  },
+  {
+    "source": "The Federal Reserve kept interest rates unchanged.",
+    "reference": "美联储维持利率不变。",
+    "domain": "news"
+  },
+  {
+    "source": "This movie is not nearly as good as the trailer made it look.",
+    "reference": "这部电影远没有预告片里看起来那么好。",
+    "domain": "entertainment"
+  }
+]

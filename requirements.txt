@@ -1,0 +1,5 @@
+numpy>=2,<3
+ctranslate2>=4.6,<5
+webrtcvad-wheels>=2.0.14,<3
+sentencepiece>=0.2,<1
+sherpa-onnx>=1.13,<2

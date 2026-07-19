@@ -1,0 +1,20 @@
+Realtime Translator
+Copyright 2026 moxya
+
+This product bundles or downloads third-party machine-learning models. Those
+models are not relicensed under the project's Apache License 2.0.
+
+Zipformer streaming ASR
+  Model: sherpa-onnx-streaming-zipformer-en-2023-06-21
+  Upstream training project: k2-fsa/icefall
+  License metadata: Apache License 2.0
+
+Streaming English punctuation
+  Model: sherpa-onnx-online-punct-en-2024-08-06
+  Upstream: frankyoujian/Edge-Punct-Casing
+  See the upstream project and model archive for applicable terms.
+
+English-to-Chinese translation
+  Model: OPUS/Tatoeba eng-zho opus-2020-07-17
+  Upstream: Helsinki-NLP / OPUS-MT and Tatoeba-MT
+  The model bundle retains its upstream README and LICENSE files.
