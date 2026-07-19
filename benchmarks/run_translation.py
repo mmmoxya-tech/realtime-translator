@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import json
 import statistics
 import sys
@@ -14,9 +15,12 @@ from rttranslate.translator import LocalTranslator  # noqa: E402
 
 
 def main() -> None:
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--glossary", action="append", default=[])
+    args = parser.parse_args()
     samples = json.loads(
         (PROJECT / "benchmarks/translation_samples.json").read_text())
-    translator = LocalTranslator()
+    translator = LocalTranslator(glossary_paths=args.glossary)
     translator.warmup()
     durations = []
     print("domain\tlatency_ms\tsource\ttranslation\treference")

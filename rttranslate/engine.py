@@ -9,6 +9,7 @@ from .audio import AudioCapture, AudioRingBuffer, default_sink
 from .events import Event
 from .punctuation import StreamingPunctuator
 from .recognizer import StreamingRecognizer
+from .subtitles import SubtitleRecorder
 from .translator import LocalTranslator
 from .translation_queue import TranslationQueue
 from .vad import UtteranceBoundary, VoiceActivityDetector
@@ -27,9 +28,11 @@ def run(args) -> None:
     recognizer.check()
     punctuator = StreamingPunctuator(args.punctuation_model)
     punctuator.check()
-    translator = LocalTranslator(args.translation_model, args.translation_threads)
+    translator = LocalTranslator(
+        args.translation_model, args.translation_threads, args.glossary)
     translator.check()
     translator.warmup()
+    recorder = SubtitleRecorder(args.subtitle_output)
     vad = VoiceActivityDetector(mode=args.vad_mode)
     boundary = UtteranceBoundary(args.vad_silence, args.max_utterance)
     translations = TranslationQueue()
@@ -52,6 +55,10 @@ def run(args) -> None:
                     f"end_to_end_ms={end_to_end_ms}",
                     file=sys.stderr,
                 )
+                if update.type == "final":
+                    recorder.record(
+                        update.captured_at, update.audio_at,
+                        update.original, translated)
                 emit(Event("translation", update.utterance_id, update.original,
                            translated, update.captured_at,
                            revision=update.revision,
@@ -179,3 +186,4 @@ def run(args) -> None:
         capture.stop()
         translations.close()
         worker.join(timeout=2)
+        recorder.close()

@@ -44,11 +44,21 @@ translate --vad-silence 0.8 --max-utterance 15
 translate --audio-target NODE_NAME
 translate --overlay-width 960 --overlay-bottom 90
 translate --overlay-timeout 6 --overlay-scale 1.15
+translate --glossary glossaries/technology.json
+translate --glossary glossaries/gaming.json --glossary glossaries/news.json
+translate --subtitle-output ~/Videos/live-captions.srt
 ```
 
 指定 `--audio-target` 后将固定使用该设备，不再自动跟随系统默认设备。
 运行日志包含 ASR、翻译排队、翻译执行和端到端延迟指标，以及音频缓冲
 溢出警告。
+
+术语配置是可选的译后文字修正规则。每个文件是“原译文片段”到“期望片段”的
+JSON 对象，可以多次指定并按命令行顺序应用。内置配置不会默认启用，避免在
+不相关语境中把正常词语误改。
+
+`--subtitle-output` 在正常退出时保存最终双语字幕，支持 JSON Lines、SRT 和
+WebVTT，输出格式由文件扩展名决定。SRT/VTT 第一行显示中文，第二行保留英文。
 
 环境诊断：
 
@@ -82,6 +92,11 @@ python3 -m py_compile main.py overlay.py rttranslate/*.py
 bash -n run.sh install.sh translate
 sha256sum --check MODEL_SHA256SUMS
 .venv/bin/python benchmarks/run_translation.py
+.venv/bin/python benchmarks/run_translation.py \
+  --glossary glossaries/technology.json \
+  --glossary glossaries/gaming.json \
+  --glossary glossaries/news.json \
+  --glossary glossaries/entertainment.json
 ```
 
 项目源码采用 Apache License 2.0。模型不因与项目一同分发而被重新许可，

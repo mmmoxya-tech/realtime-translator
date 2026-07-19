@@ -23,6 +23,8 @@ class TranslatorTests(unittest.TestCase):
         result = mock.Mock()
         result.hypotheses = [["▁你好"]]
         instance.model = mock.Mock()
+        instance.terminology = mock.Mock()
+        instance.terminology.apply.side_effect = lambda text: text
         instance.model.translate_batch.return_value = [result]
         self.assertEqual(instance.translate("hello"), "你好")
         source = instance.model.translate_batch.call_args.args[0][0]

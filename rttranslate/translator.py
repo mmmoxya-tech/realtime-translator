@@ -3,6 +3,8 @@ from __future__ import annotations
 from pathlib import Path
 import re
 
+from .terminology import Terminology
+
 
 PROJECT_DIR = Path(__file__).resolve().parent.parent
 DEFAULT_MODEL = PROJECT_DIR / "models/opus-mt-en-zh-ct2"
@@ -14,12 +16,13 @@ class LocalTranslator:
     """Low-latency English-to-Chinese translation with OPUS-MT."""
 
     def __init__(self, model_path: str | Path = DEFAULT_MODEL,
-                 threads: int = 6):
+                 threads: int = 6, glossary_paths=()):
         import ctranslate2
         import sentencepiece as spm
 
         self.model_path = Path(model_path)
         self.threads = threads
+        self.terminology = Terminology(glossary_paths)
         self.source_spm = spm.SentencePieceProcessor(
             model_file=str(DEFAULT_SOURCE_SPM))
         self.target_spm = spm.SentencePieceProcessor(
@@ -51,4 +54,6 @@ class LocalTranslator:
         translated = re.sub(r"(?<=[\u3400-\u9fff])\s+(?=[\u3400-\u9fff])",
                             "", translated)
         translated = re.sub(r"\s+([，。！？；：、,.!?;:])", r"\1", translated)
-        return translated.translate(str.maketrans(",.!?;:", "，。！？；："))
+        translated = translated.translate(str.maketrans(",.!?;:", "，。！？；："))
+        translated = re.sub(r"(?<=[，。！？；：、])\s+", "", translated)
+        return self.terminology.apply(translated)

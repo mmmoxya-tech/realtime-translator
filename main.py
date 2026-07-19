@@ -16,6 +16,10 @@ def main():
     parser.add_argument("--translation-model",
                         default="models/opus-mt-en-zh-ct2")
     parser.add_argument("--translation-threads", type=int, default=6)
+    parser.add_argument("--glossary", action="append", default=[],
+                        help="译后术语 JSON，可重复指定并按顺序应用")
+    parser.add_argument("--subtitle-output",
+                        help="保存最终双语字幕（.jsonl、.srt 或 .vtt）")
     parser.add_argument("--diagnose", action="store_true")
     parser.add_argument("--audio-target")
     parser.add_argument("--audio-block", type=float, default=0.1)
