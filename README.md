@@ -44,6 +44,7 @@ translate --vad-silence 0.8 --max-utterance 15
 translate --audio-target NODE_NAME
 translate --overlay-width 960 --overlay-bottom 90
 translate --overlay-timeout 6 --overlay-scale 1.15
+translate --overlay-animation-ms 220
 translate --glossary glossaries/technology.json
 translate --glossary glossaries/gaming.json --glossary glossaries/news.json
 translate --subtitle-output ~/Videos/live-captions.srt

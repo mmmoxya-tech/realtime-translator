@@ -37,6 +37,8 @@ def main():
                         help="无新字幕多少秒后隐藏")
     parser.add_argument("--overlay-scale", type=float, default=1.0,
                         help="字幕字号缩放比例")
+    parser.add_argument("--overlay-animation-ms", type=int, default=180,
+                        help="文字淡入动画毫秒数，设为 0 可关闭")
     args = parser.parse_args()
     if args.diagnose:
         raise SystemExit(report())
@@ -49,6 +51,8 @@ def main():
         parser.error("字幕宽度至少为 320，底部间距不能为负数")
     if args.overlay_timeout <= 0 or not 0.5 <= args.overlay_scale <= 2.5:
         parser.error("字幕隐藏时间必须大于零，字号缩放范围为 0.5 到 2.5")
+    if not 0 <= args.overlay_animation_ms <= 1000:
+        parser.error("文字动画时长范围为 0 到 1000 毫秒")
     run(args)
 
 

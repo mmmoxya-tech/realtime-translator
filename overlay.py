@@ -50,9 +50,25 @@ class Overlay(Gtk.Application):
         self.last_update = 0.0
         self.opacity = 1.0
         self.target_opacity = 1.0
+        self.label_markup = {}
+        self.text_animations = {}
 
     def text_size(self, base):
         return str(round(base * self.args.overlay_scale))
+
+    def set_animated_markup(self, label, markup, strength=0.35):
+        """Replace label text once and ease it in without hiding old content."""
+        if self.label_markup.get(label) == markup:
+            return
+        self.label_markup[label] = markup
+        label.set_markup(markup)
+        duration = self.args.overlay_animation_ms / 1000
+        if duration <= 0:
+            label.set_opacity(1.0)
+            self.text_animations.pop(label, None)
+            return
+        label.set_opacity(1.0 - strength)
+        self.text_animations[label] = (time.monotonic(), duration, strength)
 
     def do_activate(self):
         window = Gtk.ApplicationWindow(application=self)
@@ -126,9 +142,9 @@ class Overlay(Gtk.Application):
         if kind != "error":
             self.translation.remove_css_class("error")
         if kind == "status":
-            self.translation.set_markup(
+            self.set_animated_markup(self.translation,
                 f'<span size="{self.text_size(13500)}" alpha="70%">'
-                f'{html.escape(event.get("message", ""))}</span>')
+                f'{html.escape(event.get("message", ""))}</span>', 0.25)
             self.original.set_visible(False)
             return
         utterance_id = int(event.get("utterance_id", 0))
@@ -144,38 +160,52 @@ class Overlay(Gtk.Application):
         original = event.get("original", "")
         if original:
             self.original.set_visible(True)
-            self.original.set_markup(
-                f'<span size="{self.text_size(13500)}">{html.escape(original)}</span>')
+            self.set_animated_markup(
+                self.original,
+                f'<span size="{self.text_size(13500)}">{html.escape(original)}</span>',
+                0.18)
         if kind == "speech_start":
-            self.translation.set_markup(
-                f'<span size="{self.text_size(14500)}" alpha="65%">正在识别…</span>')
+            self.set_animated_markup(
+                self.translation,
+                f'<span size="{self.text_size(14500)}" alpha="65%">正在识别…</span>',
+                0.25)
             self.original.set_visible(False)
         elif kind == "hypothesis":
             self.original.set_visible(True)
-            self.original.set_markup(
+            self.set_animated_markup(self.original,
                 f'<span size="{self.text_size(14000)}">'
-                f'{html.escape(event.get("original", ""))}</span>')
+                f'{html.escape(event.get("original", ""))}</span>', 0.14)
             if self.translated_id != utterance_id:
-                self.translation.set_markup(
+                self.set_animated_markup(self.translation,
                     f'<span size="{self.text_size(14500)}" '
-                    'alpha="65%">正在识别…</span>')
+                    'alpha="65%">正在识别…</span>', 0.2)
         elif kind == "final":
             if self.translated_id != utterance_id:
-                self.translation.set_markup(
-                    f'<span size="{self.text_size(14500)}">正在翻译…</span>')
+                self.set_animated_markup(
+                    self.translation,
+                    f'<span size="{self.text_size(14500)}">正在翻译…</span>', 0.25)
         elif kind == "translation":
             self.translated_id = utterance_id
-            self.translation.set_markup(
+            self.set_animated_markup(self.translation,
                 f'<span size="{self.text_size(18000)}">'
-                f'{html.escape(event.get("translation", ""))}</span>')
+                f'{html.escape(event.get("translation", ""))}</span>', 0.42)
         elif kind == "error":
-            self.translation.set_markup(
-                f'<span size="{self.text_size(14500)}">翻译暂时不可用</span>')
+            self.set_animated_markup(
+                self.translation,
+                f'<span size="{self.text_size(14500)}">翻译暂时不可用</span>', 0.3)
             self.translation.add_css_class("error")
 
     def tick(self):
+        now = time.monotonic()
+        for label, (started_at, duration, strength) in list(
+                self.text_animations.items()):
+            progress = min(1.0, (now - started_at) / duration)
+            eased = 1.0 - (1.0 - progress) ** 3
+            label.set_opacity(1.0 - strength * (1.0 - eased))
+            if progress >= 1.0:
+                self.text_animations.pop(label, None)
         if (self.last_update and
-                time.monotonic() - self.last_update > self.args.overlay_timeout):
+                now - self.last_update > self.args.overlay_timeout):
             self.target_opacity = 0.0
         if self.opacity < self.target_opacity:
             self.opacity = min(self.target_opacity, self.opacity + 0.18)
@@ -194,6 +224,7 @@ def parse_args():
     parser.add_argument("--overlay-bottom", type=int, default=72)
     parser.add_argument("--overlay-timeout", type=float, default=4.0)
     parser.add_argument("--overlay-scale", type=float, default=1.0)
+    parser.add_argument("--overlay-animation-ms", type=int, default=180)
     return parser.parse_known_args()[0]
 
 
