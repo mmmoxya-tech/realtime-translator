@@ -14,25 +14,24 @@ from gi.repository import Gio, GLib, Gtk, Gtk4LayerShell, Pango
 CSS = b"""
 window { background: transparent; }
 .card {
-        background-color: rgba(18,19,23,.36);
-        background-image: linear-gradient(to bottom,
-                          rgba(255,255,255,.16),
-                          rgba(255,255,255,.035));
-        border: 1px solid rgba(255,255,255,.28);
-        border-radius: 26px;
-        box-shadow: inset 0 1px 0 rgba(255,255,255,.18),
-                    0 10px 32px rgba(0,0,0,.30);
-        padding: 12px 24px;
+        background: transparent;
+        border: none;
+        box-shadow: none;
+        padding: 8px 16px;
 }
 .translation {
         color: rgba(255,255,255,.98);
         font-family: "Noto Sans CJK SC", "Noto Sans", sans-serif;
         font-weight: 500;
+        text-shadow: 0 2px 5px rgba(0,0,0,.95),
+                     0 0 2px rgba(0,0,0,1);
 }
 .original {
-        color: rgba(235,238,245,.66);
+        color: rgba(242,244,248,.82);
         font-family: "Noto Sans", "Noto Sans CJK SC", sans-serif;
         font-weight: 400;
+        text-shadow: 0 2px 4px rgba(0,0,0,.95),
+                     0 0 2px rgba(0,0,0,1);
 }
 .error { color: #ffb4ab; }
 """
