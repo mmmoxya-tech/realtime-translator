@@ -29,7 +29,7 @@ def main():
                         help="连续静音多少秒后提交当前句")
     parser.add_argument("--max-utterance", type=float, default=15.0,
                         help="单句最长秒数，超过后强制切分")
-    parser.add_argument("--overlay-width", type=int, default=840,
+    parser.add_argument("--overlay-width", type=int, default=1120,
                         help="字幕卡片宽度")
     parser.add_argument("--overlay-bottom", type=int, default=72,
                         help="字幕卡片距屏幕底部像素")
